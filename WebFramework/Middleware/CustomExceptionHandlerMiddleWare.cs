@@ -12,18 +12,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
 using Webframework.Api;
+using System.Globalization;
 
 namespace WebFramework.Middlewares
 {
-    public static class CustomExceptionHandlerMiddlewareExtensions 
-    {
-        public static IApplicationBuilder UseCustomExceptionHandler(this IApplicationBuilder builder)
-        {
-            return builder.UseMiddleware<CustomExceptionHandlerMiddleware>();
-        }
-
-    }
-
+    
     public class CustomExceptionHandlerMiddleware
     {
         private readonly RequestDelegate _next;
@@ -37,7 +30,7 @@ namespace WebFramework.Middlewares
             _logger = logger;
         }
 
-        public async Task InvokeAsync(HttpContext context,RequestDelegate next)
+        public async Task Invoke(HttpContext context)
         {
             string message = null;
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
@@ -136,5 +129,13 @@ namespace WebFramework.Middlewares
                 }
             }
         }
+    }
+    public static class CustomExceptionHandlerMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseCustomExceptionHandler(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<CustomExceptionHandlerMiddleware>();
+        }
+
     }
 }

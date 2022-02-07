@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Webframework.Configuration
 {
-    public static class ServicesExtentions
+    public static class ServicesExtention
     {
         public static void AddDependencyInjections(this IServiceCollection services)
         {
@@ -21,8 +21,6 @@ namespace Webframework.Configuration
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
 
-
-            services.AddSingleton<RequestDelegate>();
 
         }
 

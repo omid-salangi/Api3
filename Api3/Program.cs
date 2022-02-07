@@ -1,7 +1,10 @@
 using Data;
-using NLog;
 using Microsoft.EntityFrameworkCore;
-var logger = NLog.LogManager.Setup().LoadConfigurationFromFile("/nlog.config").GetCurrentClassLogger();
+using NLog;
+using Webframework.Configuration;
+using WebFramework.Middlewares;
+
+var logger = LogManager.Setup().LoadConfigurationFromFile("/nlog.config").GetCurrentClassLogger();
 logger.Debug("init main");
 try
 {
@@ -9,22 +12,36 @@ try
 
     // add mvc to project
     builder.Services.AddControllersWithViews();
+    builder.Services.AddMvcCore();
 
     builder.Services.AddDbContext<Context>(options =>
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("BlogDbConnection"));
     });
+    builder.Services.AddDependencyInjections();
+
 
     var app = builder.Build();
 
 
+    app.UseCustomExceptionHandler();
 
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+    }
 
-
+    app.UseHttpsRedirection();
     app.UseStaticFiles();
+    app.UseRouting();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    
     app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+        "default",
+        "{controller=Home}/{action=Index}/{id?}");
 
 
     app.Run();
@@ -37,5 +54,5 @@ catch (Exception e)
 finally
 {
     // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-   NLog.LogManager.Shutdown();
+    LogManager.Shutdown();
 }
