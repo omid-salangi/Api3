@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Interface;
-using Application.ViewModel;
+using Application.Model;
 using Domain.Interface;
 
 namespace Application.Services
@@ -18,9 +18,9 @@ namespace Application.Services
             _post = post;
         }
 
-        public async Task<bool> AddPost(AddPostViewModel model,CancellationToken cancellationToken)
+        public async Task<bool> AddPost(Postdto model,CancellationToken cancellationToken)
         { 
-            return await _post.AddPost(model.title, model.description,DateTime.Now , model.author,cancellationToken);
+            return await _post.AddPost(model.title, model.description,DateTime.Now.ToUniversalTime() , model.author,cancellationToken);
         }
     }
 }

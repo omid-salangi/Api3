@@ -1,8 +1,8 @@
 ﻿using Application.Interface;
 using Application.Model;
-using Application.ViewModel;
 using Common.Api;
 using Common.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Webframework.Api;
 using Webframework.Filters;
@@ -28,7 +28,7 @@ public class APIController : ControllerBase
     }
 
     [HttpPost("AddPost")]
-    public async Task<AddPostViewModel> AddPost(AddPostViewModel model, CancellationToken cancellationToken)
+    public async Task<Postdto> AddPost(Postdto model, CancellationToken cancellationToken)
     {
         // HttpContext.RequestAborted => WeakReference can use it instead of cancellation token
         var data = await _post.AddPost(model, cancellationToken);
@@ -50,21 +50,24 @@ public class APIController : ControllerBase
     }
 
     [HttpGet("Test")] // its important to set name of api method
+    [Authorize]
     public async Task<ApiResult> Test()
     {
         throw new BadRequestException("hi this is a test", ApiResultStatusCode.BadRequest);
     }
 
     [HttpPost("Token")]
-    public async Task<ApiResult<Logindto>> Token(Logindto model, CancellationToken cancellationToken)
+    [AllowAnonymous]
+    public async Task<string> Token(Logindto model, CancellationToken cancellationToken)
     {
         var user = await _user.GetByUsername(model.UserName, model.Password, cancellationToken);
         if (user == null)
-            //throw new BadRequestException("نام کاربری یا رمز عبور اشتباه است.");
-            return BadRequest();
+            throw new BadRequestException("نام کاربری یا رمز عبور اشتباه است.");
+            
 
-        return null;
-        //var jwt = await _jwt.Generate(user);
-        //return jwt;
+        var jwt = await _jwt.Generate(user);
+        return jwt;
     }
 }
+
+// we can use httpcontext.user for token informations

@@ -22,14 +22,13 @@ namespace Data.Repositories
             Post post = new Post()
             {
                 UserId = 1,
-                title = title,
-                Description = description,
-                author = author,
-                Time = time
-
             };
          var res=   await _context.Posts.AddAsync(post,cancellationToken);
-          var res1= await _context.SaveChangesAsync(cancellationToken);
+         post.Description=description;
+         post.Time=time;
+         post.author=author;
+         post.title=title;
+          _context.SaveChanges();
            return true;
         }
 

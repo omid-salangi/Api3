@@ -1,4 +1,6 @@
+using Common.SiteSettings;
 using Data;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using Webframework.Configuration;
@@ -9,29 +11,36 @@ logger.Debug("init main");
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    // site settings
+    var _sitesettings = builder.Configuration.GetSection(nameof(SiteSettings)).Get<SiteSettings>();
 
+    builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection(nameof(SiteSettings)));
     // add mvc to project
     builder.Services.AddControllersWithViews();
-    builder.Services.AddMvcCore();
+    builder.Services.AddMvcCore(option =>
+    {
+        option.Filters.Add(new AuthorizeFilter()); // authorize for all of controllers 
+    });
 
     builder.Services.AddDbContext<Context>(options =>
     {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("BlogDbConnection"));
+        options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreDbConnection"));
     });
+    
     builder.Services.AddDependencyInjections();
-
+    builder.Services.AddJwtAuthentication(_sitesettings.JwtSettings);
 
     var app = builder.Build();
 
 
     app.UseCustomExceptionHandler();
 
-    if (!app.Environment.IsDevelopment())
-    {
-        app.UseExceptionHandler("/Home/Error");
-        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-        app.UseHsts();
-    }
+    //if (!app.Environment.IsDevelopment())
+    //{
+    //    app.UseExceptionHandler("/Home/Error");
+    //    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    //    app.UseHsts();
+    //}
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();

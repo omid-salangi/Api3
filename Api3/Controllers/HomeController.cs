@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Application.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Controllers;
@@ -12,23 +13,23 @@ public class HomeController : Controller
     {
         _logger = logger;
     }
-
+    [AllowAnonymous]
     public IActionResult Index()
     {
         return View();
     }
-
+    [AllowAnonymous]
     public IActionResult Privacy()
     {
         return View();
     }
 
-    [HttpGet]
+    [AllowAnonymous]
     public async Task<string> test()
     {
         return "this is a test";
     }
-
+    [AllowAnonymous]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

@@ -31,12 +31,12 @@ namespace Webframework.Filters
             }
             else if (context.Result is BadRequestObjectResult badRequestObjectResult)
             {
-                
+
                 System.Reflection.PropertyInfo pi = badRequestObjectResult.Value.GetType().GetProperty("Errors");
                 Dictionary<string, string[]> errors = (Dictionary<string, string[]>)(pi.GetValue(badRequestObjectResult.Value, null));
                 var errorMessages = errors.Values.SelectMany(p => (string[])p).Distinct();
-                  var  message = string.Join(" | ", errorMessages);
-                
+                var message = string.Join(" | ", errorMessages);
+
                 var apiResult = new ApiResult(false, ApiResultStatusCode.BadRequest, message);
                 context.Result = new JsonResult(apiResult) { StatusCode = badRequestObjectResult.StatusCode };
             }

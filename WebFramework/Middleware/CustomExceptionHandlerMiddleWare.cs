@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
 using Webframework.Api;
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace WebFramework.Middlewares
 {
@@ -30,7 +31,7 @@ namespace WebFramework.Middlewares
             _logger = logger;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             string message = null;
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
