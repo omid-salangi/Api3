@@ -4,15 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Model
 {
-    public class Roles
+    public class Roles : IdentityRole
     {
-        [Required]  
-        [StringLength(50)]
-        public string name { get; set; }    
-
+        
         [Required]
         [StringLength(100)]
         public string Description { get; set; }

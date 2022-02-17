@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using Webframework.Configuration;
+using WebFramework.Configuration;
 using WebFramework.Middlewares;
 
 var logger = LogManager.Setup().LoadConfigurationFromFile("/nlog.config").GetCurrentClassLogger();
@@ -26,7 +27,7 @@ try
     {
         options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreDbConnection"));
     });
-    
+    builder.Services.AddCustomIdentity(_sitesettings);
     builder.Services.AddDependencyInjections();
     builder.Services.AddJwtAuthentication(_sitesettings.JwtSettings);
 

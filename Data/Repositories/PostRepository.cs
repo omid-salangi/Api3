@@ -21,7 +21,7 @@ namespace Data.Repositories
         {
             Post post = new Post()
             {
-                UserId = 1,
+                UserId = "1",
             };
          var res=   await _context.Posts.AddAsync(post,cancellationToken);
          post.Description=description;

@@ -8,17 +8,22 @@ using System.Threading.Tasks;
 using Application.Interface;
 using Common.SiteSettings;
 using Domain.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services
 {
     public class JwtServices : IJwtServices
     {
         private readonly SiteSettings _siteSettings;
-        public JwtServices(IOptionsSnapshot<SiteSettings> settings)
+        private readonly SignInManager<User> _signInManager;
+
+        public JwtServices(IOptionsSnapshot<SiteSettings> siteSettings, SignInManager<User> signInManager)
         {
-            _siteSettings = settings.Value;
+            _siteSettings = siteSettings.Value;
+            _signInManager = signInManager;
         }
         public async Task<string> Generate(User user)
         {
@@ -51,18 +56,25 @@ namespace Application.Services
 
         public async Task<IEnumerable<Claim>> _GetClaims(User user)
         {
-            var list = new List<Claim>()
-            {
-                new Claim(ClaimTypes.Name , user.USerName),
-                new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-                new Claim(ClaimTypes.MobilePhone,"09175312786")
-            };
-            var roles = new Roles[] { new Roles() { name = "Admin" } };
-            foreach (var role in roles)
-            {
-                list.Add(new Claim(ClaimTypes.Role, role.name));
-            }
+            var result = await _signInManager.ClaimsFactory.CreateAsync(user);
+            // add custom claims
+            var list = new List<Claim>(result.Claims);
+            //list.Add();
             return list;
+            //var securitystampclaimtype = new ClaimsIdentityOptions().SecurityStampClaimType;
+            //var list = new List<Claim>()
+            //{
+            //    new Claim(ClaimTypes.Name , user.UserName),
+            //    new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
+            //    new Claim(ClaimTypes.MobilePhone,"09175312786"),
+            //    //new Claim(securitystampclaimtype,user.Securitystamp.ToString())
+            //};
+            //var roles = new Roles[] { new Roles() { Name = "Admin" } };
+            //foreach (var role in roles)
+            //{
+            //    list.Add(new Claim(ClaimTypes.Role, role.Name));
+            //}
+            //return list;
         }
     }
 }

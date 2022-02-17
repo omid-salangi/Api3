@@ -1,8 +1,11 @@
-﻿using Application.Interface;
+﻿using System.Diagnostics.Eventing.Reader;
+using Application.Interface;
 using Application.Model;
 using Common.Api;
 using Common.Exceptions;
+using Domain.Model;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Webframework.Api;
 using Webframework.Filters;
@@ -18,13 +21,19 @@ public class APIController : ControllerBase
     private readonly ILogger<APIController> _logger;
     private readonly IPostService _post;
     private readonly IUserServices _user;
+    private readonly UserManager<User> _userManager;
+    private readonly RoleManager<Roles> _roleManager;
+    private readonly SignInManager<User> _signInManager;
 
-    public APIController(IPostService post, IUserServices user, IJwtServices jwt, ILogger<APIController> logger)
+    public APIController(IJwtServices jwt, ILogger<APIController> logger, IPostService post, IUserServices user, UserManager<User> userManager, RoleManager<Roles> roleManager, SignInManager<User> signInManager)
     {
-        _post = post;
-        _user = user;
         _jwt = jwt;
         _logger = logger;
+        _post = post;
+        _user = user;
+        _userManager = userManager;
+        _roleManager = roleManager;
+        _signInManager = signInManager;
     }
 
     [HttpPost("AddPost")]
@@ -36,17 +45,27 @@ public class APIController : ControllerBase
     }
 
     [HttpPost("AddUser")]
+    [AllowAnonymous]
     public async Task<ApiResult<Userdto>> AddUser(Userdto userdto, CancellationToken cancellationToken)
     {
-        if (await _user.Any(userdto.UserName.ToLower()))
+        if (await _user.Any(userdto.UserName))
             return new ApiResult<Userdto>(false, ApiResultStatusCode.BadRequest, userdto, "نام کاربری موجود می باشد.");
-
-        var res = await _user.AddUserAsync(userdto.UserName.ToLower(), userdto.FullName, userdto.Password, userdto.Age,
-            userdto.Email,
-            cancellationToken);
-        if (res)
+        var user = new User()
+        {
+            UserName = userdto.UserName,
+            age = userdto.Age,
+            Email = userdto.Email,
+            FullName = userdto.FullName
+        };
+        var res = await _userManager.CreateAsync(user, userdto.Password);
+        if (res.Succeeded)
             return Ok();
-        return new ApiResult<Userdto>(false, ApiResultStatusCode.ServerError, userdto);
+        string message = "";
+        foreach (var e in res.Errors)
+        {
+            message += "|" + e.Description;
+        }
+        return new ApiResult<Userdto>(false, ApiResultStatusCode.BadRequest, userdto, message);
     }
 
     [HttpGet("Test")] // its important to set name of api method
@@ -60,13 +79,21 @@ public class APIController : ControllerBase
     [AllowAnonymous]
     public async Task<string> Token(Logindto model, CancellationToken cancellationToken)
     {
-        var user = await _user.GetByUsername(model.UserName, model.Password, cancellationToken);
+        var user = await _userManager.FindByNameAsync(model.UserName);
         if (user == null)
+        {
             throw new BadRequestException("نام کاربری یا رمز عبور اشتباه است.");
-            
+        }
+        else if (await _userManager.CheckPasswordAsync(user, model.Password)) 
+        {
+            var jwt = await _jwt.Generate(user);
+            return jwt;
+        }
+        else
+        {
+            throw new BadRequestException("نام کاربری یا رمز عبور اشتباه است.");
+        }
 
-        var jwt = await _jwt.Generate(user);
-        return jwt;
     }
 }
 

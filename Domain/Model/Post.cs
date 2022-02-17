@@ -19,7 +19,7 @@ namespace Domain.Model
 
         // relations
         
-        public int? UserId { get; set; }
+        public string? UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }
         public ICollection<CategoryToPost> CategoryToPosts { get; set; }
