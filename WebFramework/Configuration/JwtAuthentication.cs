@@ -18,11 +18,15 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace WebFramework.Configuration
 {
-    public static class JwtAuthenticationExtention
+    public static class JwtAuthenticationExtentions
     {
         public static void AddJwtAuthentication(this IServiceCollection services, JwtSettings jwtSettings)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            services.AddAuthentication(options => {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
             {
                 var secretkey = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
                 var encryptionkey = Encoding.UTF8.GetBytes(jwtSettings.Encryptkey);

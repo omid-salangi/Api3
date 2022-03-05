@@ -30,7 +30,7 @@ namespace WebFramework.Configuration
                 //options.Lockout.MaxFailedAccessAttempts = 5;
                 //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
 
-            }).AddEntityFrameworkStores<Context>()
+            }).AddEntityFrameworkStores<ApplicationContext>()
                 .AddDefaultTokenProviders()
                 .AddErrorDescriber<TranslatePersian>();
         }

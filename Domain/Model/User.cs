@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Runtime;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Model
 {
-    public class User : IdentityUser
+    public class User : IdentityUser<string>
     {
         public User()
         {
@@ -17,15 +11,17 @@ namespace Domain.Model
             
         }
         
-        [Required]
-        public string FullName { get; set; }
-        public int age { get; set; }
+        public string? FullName { get; set; }
+        public int Age { get; set; }
         public bool IsActive { get; set; }
-        public DateTimeOffset? lastLoginDate { get; set; }
+        public DateTimeOffset? LastLoginDate { get; set; }
+        public string? ProfileImg { get; set; }
+        public string? SelfDescription { get; set; }
 
         //relations
 
         public ICollection<Post> Posts { get; set; }
+        public ICollection<Comments> Comments { get; set; }
 
     }
 }

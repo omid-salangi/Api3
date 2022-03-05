@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.Eventing.Reader;
 using Application.Interface;
 using Application.Model;
+using AutoMapper;
 using Common.Api;
 using Common.Exceptions;
 using Domain.Model;
@@ -24,8 +25,9 @@ public class APIController : ControllerBase
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Roles> _roleManager;
     private readonly SignInManager<User> _signInManager;
+    private readonly IMapper _mapper;
 
-    public APIController(IJwtServices jwt, ILogger<APIController> logger, IPostService post, IUserServices user, UserManager<User> userManager, RoleManager<Roles> roleManager, SignInManager<User> signInManager)
+    public APIController(IJwtServices jwt, ILogger<APIController> logger, IPostService post, IUserServices user, UserManager<User> userManager, RoleManager<Roles> roleManager, SignInManager<User> signInManager, IMapper mapper)
     {
         _jwt = jwt;
         _logger = logger;
@@ -34,29 +36,25 @@ public class APIController : ControllerBase
         _userManager = userManager;
         _roleManager = roleManager;
         _signInManager = signInManager;
+        _mapper = mapper;
     }
 
     [HttpPost("AddPost")]
-    public async Task<Postdto> AddPost(Postdto model, CancellationToken cancellationToken)
+    public async Task AddPost(Postdto model, CancellationToken cancellationToken)
     {
         // HttpContext.RequestAborted => WeakReference can use it instead of cancellation token
-        var data = await _post.AddPost(model, cancellationToken);
-        return model;
+        var temp = _mapper.Map<Post>(model); 
+        await _post.AddPost(temp, cancellationToken);
+        
     }
 
     [HttpPost("AddUser")]
     [AllowAnonymous]
     public async Task<ApiResult<Userdto>> AddUser(Userdto userdto, CancellationToken cancellationToken)
     {
-        if (await _user.Any(userdto.UserName))
+        if (await _user.Any(userdto.UserName , cancellationToken))
             return new ApiResult<Userdto>(false, ApiResultStatusCode.BadRequest, userdto, "نام کاربری موجود می باشد.");
-        var user = new User()
-        {
-            UserName = userdto.UserName,
-            age = userdto.Age,
-            Email = userdto.Email,
-            FullName = userdto.FullName
-        };
+        var user = _mapper.Map<User>(userdto);
         var res = await _userManager.CreateAsync(user, userdto.Password);
         if (res.Succeeded)
             return Ok();
@@ -69,15 +67,15 @@ public class APIController : ControllerBase
     }
 
     [HttpGet("Test")] // its important to set name of api method
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ApiResult> Test()
     {
         throw new BadRequestException("hi this is a test", ApiResultStatusCode.BadRequest);
     }
 
-    [HttpPost("Token")]
-    [AllowAnonymous]
-    public async Task<string> Token(Logindto model, CancellationToken cancellationToken)
+    
+    [HttpPost("Login")]
+    public async Task<ApiResult> Login(Logindto model, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByNameAsync(model.UserName);
         if (user == null)
@@ -87,7 +85,7 @@ public class APIController : ControllerBase
         else if (await _userManager.CheckPasswordAsync(user, model.Password)) 
         {
             var jwt = await _jwt.Generate(user);
-            return jwt;
+            return new ApiResult(true,0, jwt);
         }
         else
         {

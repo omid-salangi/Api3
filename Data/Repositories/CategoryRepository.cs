@@ -3,63 +3,49 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Common.Dependency;
 using Domain.Interface;
 using Domain.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories
 {
-    public class CategoryRepository : ICategoryRepository
+    public class CategoryRepository : ICategoryRepository , IScopedDependency
     {
-        private Context _context;
+        private readonly ApplicationContext _context;
 
-        public CategoryRepository(Context context)
+        public CategoryRepository(ApplicationContext context)
         {
             _context = context;
         }
-
-        public async Task<IEnumerable<Category>> GetAllCategories()
+        public async Task<IEnumerable<Category>> GetAllCategories(CancellationToken cancellationToken)
         {
-            return _context.Categories;
+            return await _context.Categories.ToListAsync(cancellationToken);
         }
 
-
-
-        public async Task AddCategory(string name, string description)
+        public async Task AddCategory(Category category, CancellationToken cancellationToken)
         {
-            Category temp = new Category()
-            {
-                Name = name,
-                Description = description
-            };
-            await _context.Categories.AddAsync(temp);
-
-            _context.SaveChanges();
-
-
-
+            await _context.Categories.AddAsync(category , cancellationToken);
+           await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteCategory(int id)
+        public async Task DeleteCategory(int id, CancellationToken cancellationToken)
         {
-            Category temp = await _context.Categories.FindAsync(id);
+            var temp = await _context.Categories.FindAsync(id,cancellationToken);
             _context.Categories.Remove(temp);
-            _context.SaveChanges();
-
-
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task EditCategory(int id, string name, string description)
+        public async Task EditCategory(Category category, CancellationToken cancellationToken)
         {
-            Category temp = await _context.Categories.FindAsync(id);
-            temp.Name = name;
-            temp.Description = description;
-            _context.SaveChanges();
+            _context.Categories.Update(category);
+            _context.SaveChangesAsync(cancellationToken);
         }
+
 
         public async Task<Category> GetCategory(int id)
         {
-            Category category = await _context.Categories.FindAsync(id);
-            return category;
+            return await _context.Categories.FindAsync(id);
         }
     }
 }

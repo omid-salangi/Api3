@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Interface;
+using Common.Dependency;
 using Common.SiteSettings;
 using Domain.Model;
 using Microsoft.AspNetCore.Identity;
@@ -15,7 +16,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services
 {
-    public class JwtServices : IJwtServices
+    public class JwtServices : IJwtServices , IScopedDependency
     {
         private readonly SiteSettings _siteSettings;
         private readonly SignInManager<User> _signInManager;

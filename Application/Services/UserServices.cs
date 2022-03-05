@@ -24,9 +24,14 @@ namespace Application.Services
         //    return await _user.AddUser(username, fullname, password, age, email,cancellationToken);
         //}
 
-        public async Task<bool> Any(string username)
+        public async Task<bool> Any(string username , CancellationToken cancellationToken)
         {
-            return await _user.Any(username);
+            return await _user.Any(username , cancellationToken);
+        }
+
+        public async Task<User> GetUserById(CancellationToken cancellationToken, string id)
+        {
+          return await _user.GetUserById(id, cancellationToken);
         }
 
         //public async Task<User> GetByUsername(string username, string password, CancellationToken cancellationToken)
@@ -40,13 +45,9 @@ namespace Application.Services
         //    {
         //        return null;
         //    }
-            
+
         //}
 
-        public async Task<User> GetUserById(CancellationToken cancellationToken,string id)
-        {
-            return await _user.GetUserById(id , cancellationToken);
-        }
 
         public async Task UpdateLastLogin(string id, CancellationToken cancellationToken)
         {

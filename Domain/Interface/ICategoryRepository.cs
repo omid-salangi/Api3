@@ -9,10 +9,10 @@ namespace Domain.Interface
 {
     public interface ICategoryRepository
     {
-        Task<IEnumerable<Category>> GetAllCategories();
-        Task AddCategory(string name, string description);
-        Task DeleteCategory(int id);
-        Task EditCategory(int id, string name, string description);
+        Task<IEnumerable<Category>> GetAllCategories(CancellationToken cancellationToken);
+        Task AddCategory(Category category , CancellationToken cancellationToken);
+        Task DeleteCategory(int id , CancellationToken cancellationToken);
+        Task EditCategory(Category category , CancellationToken cancellationToken);
         Task<Category> GetCategory(int id);
     }
 }

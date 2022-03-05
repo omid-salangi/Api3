@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Model;
 using System.Security.Claims;
+using Common.Dependency;
 
 namespace Application.Interface
 {
-    public interface IJwtServices
+    public interface IJwtServices 
     {
         Task<string> Generate(User user);
         Task<IEnumerable<Claim>> _GetClaims(User user);
