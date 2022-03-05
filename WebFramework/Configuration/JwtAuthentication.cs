@@ -109,7 +109,7 @@ namespace WebFramework.Configuration
                             throw new AppException(ApiResultStatusCode.UnAuthorized, "Authenticate failure.",
                                 HttpStatusCode.Unauthorized, context.AuthenticateFailure, null);
                         throw new AppException(ApiResultStatusCode.UnAuthorized,
-                            "You are unauthorized to access this resource.", HttpStatusCode.Unauthorized);
+                            "شما وارد نشده اید لطفا وارد شوید.", HttpStatusCode.Unauthorized);
 
                         //return Task.CompletedTask;
                     }

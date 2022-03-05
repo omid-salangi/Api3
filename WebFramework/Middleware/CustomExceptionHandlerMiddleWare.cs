@@ -46,7 +46,7 @@ namespace WebFramework.Middlewares
                 _logger.LogError(exception, exception.Message);
                 httpStatusCode = exception.HttpStatusCode;
                 apiStatusCode = exception.ApiStatusCode;
-
+                context.Response.StatusCode = (int)httpStatusCode;
                 if (_env.IsDevelopment())
                 {
                     var dic = new Dictionary<string, string>

@@ -75,6 +75,7 @@ public class APIController : ControllerBase
 
     
     [HttpPost("Login")]
+    [AllowAnonymous]
     public async Task<ApiResult> Login(Logindto model, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByNameAsync(model.UserName);
