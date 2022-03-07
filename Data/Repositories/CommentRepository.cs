@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Dependency;
 using Domain.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories
 {
@@ -56,6 +57,21 @@ namespace Data.Repositories
             var temp = await _context.Comments.FindAsync(id,cancellationToken);
             temp.Comment = comment;
             await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<Comments?> GetCommnetById(int id, CancellationToken cancellationToken)
+        {
+            return await _context.Comments.FindAsync(id, cancellationToken);
+        }
+
+        public async Task<IEnumerable<Comments>> GetUnconfirmedComment(CancellationToken cancellationToken)
+        {
+           return await _context.Comments.Where(c => c.IsConfirmed == false).ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<Comments>> GetCommnetsOfAPost(int postid, CancellationToken cancellationToken)
+        {
+            return await _context.Comments.Where(c => c.PostId == postid).ToListAsync(cancellationToken);
         }
     }
 }

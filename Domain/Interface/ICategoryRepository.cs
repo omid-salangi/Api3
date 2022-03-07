@@ -13,6 +13,7 @@ namespace Domain.Interface
         Task AddCategory(Category category , CancellationToken cancellationToken);
         Task DeleteCategory(int id , CancellationToken cancellationToken);
         Task EditCategory(Category category , CancellationToken cancellationToken);
-        Task<Category> GetCategory(int id);
+        Task<Category> GetCategory(int id , CancellationToken cancellationToken);
+        Task<Category> GetCategoryByName(string name , CancellationToken cancellationToken);
     }
 }

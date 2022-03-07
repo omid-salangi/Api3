@@ -14,5 +14,8 @@ namespace Domain.Interface
         Task Confirm(int id, CancellationToken cancellationToken);
         Task UnConfirm(int id, CancellationToken cancellationToken);
         Task Update(int id, string comment, CancellationToken cancellationToken);
-    }
+        Task<Comments?> GetCommnetById(int id, CancellationToken cancellationToken);
+        Task<IEnumerable<Comments>> GetUnconfirmedComment(CancellationToken cancellationToken);
+        Task<IEnumerable<Comments>> GetCommnetsOfAPost(int postid, CancellationToken cancellationToken);
+     }
 }

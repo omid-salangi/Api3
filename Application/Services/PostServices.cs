@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.Interface;
 using Application.Model;
+using Common.Dependency;
 using Domain.Interface;
 using Domain.Model;
 
 namespace Application.Services
 {
-    public class PostServices : IPostService
+    public class PostServices : IPostService , IScopedDependency
     {
         private readonly IPostRepository _post;
 

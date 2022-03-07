@@ -28,7 +28,7 @@ try
         options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreDbConnection"));
     });
     builder.Services.AddCustomIdentity(_sitesettings);
-    builder.Services.AddDependencyInjections();
+    builder.BuildAutofacServiceProvider();
     builder.Services.AddJwtAuthentication(_sitesettings.JwtSettings);
     builder.Services.AddAutoMappers();
     var app = builder.Build();

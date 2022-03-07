@@ -43,9 +43,14 @@ namespace Data.Repositories
         }
 
 
-        public async Task<Category> GetCategory(int id)
+        public async Task<Category?> GetCategory(int id , CancellationToken cancellationToken)
         {
-            return await _context.Categories.FindAsync(id);
+            return await _context.Categories.FindAsync(id , cancellationToken);
+        }
+
+        public async Task<Category?> GetCategoryByName(string name, CancellationToken cancellationToken)
+        {
+            return await _context.Categories.Where(n => n.Name == name).FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

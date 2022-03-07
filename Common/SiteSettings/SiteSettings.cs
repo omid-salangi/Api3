@@ -6,6 +6,7 @@
         public string NlogConfigPath { get; set; }
         public JwtSettings JwtSettings { get; set; }
         public IdentitySettings IdentitySettings { get; set; }
+        public EmailSettings EmailSettings { get; set; }
     }
 
     public class IdentitySettings
@@ -25,5 +26,16 @@
         public string Audience { get; set; }
         public int NotBeforeMinutes { get; set; }
         public int ExpirationMinutes { get; set; }
+    }
+
+    public class EmailSettings
+    {
+        public string Host { get; set; }
+        public int Port { get; set; }
+        public bool Ssl { get; set; }
+        public bool UseDefaultCredentials { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+        public string DisplayName { get; set; }
     }
 }

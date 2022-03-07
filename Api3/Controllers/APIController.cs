@@ -1,15 +1,19 @@
 ﻿using System.Diagnostics.Eventing.Reader;
+using System.Security.Cryptography.X509Certificates;
 using Application.Interface;
 using Application.Model;
 using AutoMapper;
 using Common.Api;
 using Common.Exceptions;
+using Common.Utilities;
 using Domain.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Webframework.Api;
 using Webframework.Filters;
+using Microsoft.AspNetCore.Hosting;
+
 
 namespace Presentation.Controllers;
 
@@ -26,8 +30,10 @@ public class APIController : ControllerBase
     private readonly RoleManager<Roles> _roleManager;
     private readonly SignInManager<User> _signInManager;
     private readonly IMapper _mapper;
+    private readonly IImageServices _image;
+    private readonly IWebHostEnvironment _env;
 
-    public APIController(IJwtServices jwt, ILogger<APIController> logger, IPostService post, IUserServices user, UserManager<User> userManager, RoleManager<Roles> roleManager, SignInManager<User> signInManager, IMapper mapper)
+    public APIController(IJwtServices jwt, ILogger<APIController> logger, IPostService post, IUserServices user, UserManager<User> userManager, RoleManager<Roles> roleManager, SignInManager<User> signInManager, IMapper mapper, IImageServices image, IWebHostEnvironment env)
     {
         _jwt = jwt;
         _logger = logger;
@@ -37,6 +43,8 @@ public class APIController : ControllerBase
         _roleManager = roleManager;
         _signInManager = signInManager;
         _mapper = mapper;
+        _image = image;
+        _env = env;
     }
 
     [HttpPost("AddPost")]
@@ -93,6 +101,22 @@ public class APIController : ControllerBase
             throw new BadRequestException("نام کاربری یا رمز عبور اشتباه است.");
         }
 
+        
+    }
+    [HttpPost("UploadPhoto")]
+    [AllowAnonymous]
+    public async Task<ApiResult> UploadPhoto(IFormFile file , CancellationToken cancellationToken)
+    {
+        if (file != null)
+        {
+            byte[] f = await file.GetBytes();
+           await _image.SaveImage(f, _env.WebRootPath, file.FileName, cancellationToken);
+            return Ok();
+        }
+        else
+        {
+            throw new BadRequestException("فایل ارسالی نمی تواند خالی باشد.");
+        }
     }
 }
 

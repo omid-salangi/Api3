@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Interface;
+using Common.Dependency;
 using Domain.Interface;
 using Domain.Model;
 
 namespace Application.Services
 {
-    public class UserServices : IUserServices
+    public class UserServices : IUserServices , IScopedDependency
     {
         private readonly IUserRepository _user;
 
